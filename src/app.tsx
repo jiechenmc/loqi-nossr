@@ -1,8 +1,15 @@
 import Message from "./components/Message";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 import { useEffect, useState } from "preact/hooks";
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, onValue } from "firebase/database";
 
+export interface Msg {
+  author: string;
+  content: string;
+  createdAt: number;
+}
 const firebaseConfig = {
   apiKey: "AIzaSyA2ffbETwL8hupSveo6d55YTOun0kYzCC4",
   authDomain: "loqi-loqi.firebaseapp.com",
@@ -30,15 +37,26 @@ export default function App() {
       const data = snapshot.val();
       if (data != null) {
         const vals = Object.values(data);
-        const dt = vals.map((e: any) => <Message text={e.content} />);
+        const dt = vals.map((e) => {
+          const msg = e as Msg;
+          return (
+            <Message
+              content={msg.content}
+              author={msg.author}
+              createdAt={msg.createdAt}
+            />
+          );
+        });
         setMsgs(dt);
       }
     });
   }, []);
 
   return (
-    <div class="flex gap-2 w-full">
-      <p class="flex-grow-1 font-bold text-xl">{msgs}</p>
-    </div>
+    <>
+      <Header />
+      <div class="flex-col gap-2 w-full">{msgs}</div>
+      <Footer />
+    </>
   );
 }
